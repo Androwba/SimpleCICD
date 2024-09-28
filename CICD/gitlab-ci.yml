@@ -1,0 +1,93 @@
+stages:
+  - build
+  - codestyle
+  - test
+  - telegramCI
+  - deploy
+  - telegramCD
+
+Building:
+  stage: build
+  tags: 
+    - build
+  script:
+    - cd src/
+    - make
+  artifacts:
+    paths:
+    - src/cat/s21_cat
+    - src/grep/s21_grep
+    expire_in: 30 days
+ 
+
+Stylecheck:
+  stage: codestyle
+  tags: 
+    - codestyle
+  allow_failure: false
+  script:
+    - cd src/
+    - make style
+
+Testing:
+  stage: test
+  tags: 
+    - test
+  allow_failure: false
+  needs: ["Building", "Stylecheck"]
+  script:
+    - cd src/
+    - make test
+  after_script:
+    - echo "$CI_JOB_STATUS" > status
+  artifacts:
+    paths:
+      - ./status
+
+TelegramCI:
+  stage: telegramCI
+  needs: ["Testing"]
+  tags:
+    - telegramCI
+  script:
+    - chmod +x ./bot.sh
+    - export CI_PROJECT_NAME
+    - export CI_PROJECT_URL
+    - export CI_PIPELINE_ID
+    - export CI_COMMIT_REF_SLUG
+  after_script:
+    - ./bot.sh "CI"
+
+Deploying:
+  stage: deploy
+  tags: 
+    - deploy
+  allow_failure: false
+  when: manual
+  script:
+    - chmod +x deploy.sh      
+    - ./deploy.sh
+  after_script:
+    - echo "$CI_JOB_STATUS" > status
+  artifacts:
+    paths:
+      - ./status
+
+TelegramCD:
+  stage: telegramCD
+  tags:
+    - telegramCD
+  needs: ["Deploying"]
+  script:
+    - chmod +x ./bot.sh
+    - export CI_PROJECT_NAME
+    - export CI_PROJECT_URL
+    - export CI_PIPELINE_ID
+    - export CI_COMMIT_REF_SLUG
+  after_script:
+    - ./bot.sh "CD"
+
+
+
+
+
