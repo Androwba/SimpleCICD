@@ -1,0 +1,9 @@
+hello
+world
+Hello
+HELLO
+
+This line should match the pattern 'for'
+This line should match the pattern '^int'
+This line is just some random text
+This line contains the word hello again
