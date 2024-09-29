@@ -6,7 +6,7 @@ else
     STATUS="Failed ❌"
 fi
 
-TOKEN="5688935438:AAFrcLkRAhWqRPcaltqLgkosbPnSEK7izzY"
+TOKEN="Private Token From BotFather"
 USER_ID="833059991"
 
 URL="https://api.telegram.org"
